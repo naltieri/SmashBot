@@ -1,6 +1,7 @@
 CC=g++
 CFLAGS=-g -c -Wall -std=gnu++11
 LDFLAGS=-g -Wall -std=gnu++11
+#LDFLAGS=-g -Wall -std=gnu++11 -lUtil
 
 SOURCES=smashbot.cpp
 GOALS=Goals/*.cpp
@@ -11,25 +12,26 @@ UTIL=Util/*.cpp
 
 EXECUTABLE=smashbot
 
-all: goals strats tactics chains main util
-	$(CC) $(LDFLAGS) *.o -o $(EXECUTABLE)
+#all: $(OBJ)
+all: goals.sylvan strats.sylvan tactics.sylvan chains.sylvan util.sylvan main
+	$(CC) $(LDFLAGS) -o $(EXECUTABLE) *.o
 
 main:
 	$(CC) $(CFLAGS) $(SOURCES)
 
-goals:
+goals.sylvan:
 	$(CC) $(CFLAGS) $(GOALS)
 
-strats:
+strats.sylvan:
 	$(CC) $(CFLAGS) $(STRATS)
 
-tactics:
+tactics.sylvan:
 	$(CC) $(CFLAGS) $(TACTICS)
 
-chains:
+chains.sylvan:
 	$(CC) $(CFLAGS) $(CHAINS)
 
-util:
+util.sylvan:
 	$(CC) $(CFLAGS) $(UTIL)
 
 clean:
