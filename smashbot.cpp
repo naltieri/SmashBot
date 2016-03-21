@@ -25,7 +25,8 @@ void FirstTimeSetup()
 {
     struct passwd *pw = getpwuid(getuid());
     std::string home_path = std::string(pw->pw_dir);
-    std::string legacy_config_path = home_path + "/.dolphin-emu";
+    // std::string legacy_config_path = home_path + "/.dolphin-emu";
+    std::string legacy_config_path = "/Applications/Dolphin.app";
     std::string mem_watcher_path;
     std::string pipe_path;
 
@@ -40,6 +41,7 @@ void FirstTimeSetup()
             std::string backup_path = home_path + "/.local/share/dolphin-emu";
             if(stat(backup_path.c_str(), &buffer) != 0)
             {
+                std::cout << "In smashbot" << std::endl;
                 std::cout << "ERROR: $XDG_DATA_HOME was empty and so was $HOME/.dolphin-emu and $HOME/.local/share/dolphin-emu " \
                     "Are you sure Dolphin is installed? Make sure it is, and then run SmashBot again." << std::endl;
                 exit(-1);

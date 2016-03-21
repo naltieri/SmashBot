@@ -21,7 +21,8 @@ MemoryWatcher::MemoryWatcher()
 
     struct passwd *pw = getpwuid(getuid());
     std::string home_path = std::string(pw->pw_dir);
-    std::string legacy_config_path = home_path + "/.dolphin-emu";
+    // std::string legacy_config_path = home_path + "/.dolphin-emu";
+    std::string legacy_config_path = "/Applications/Dolphin.app";
     std::string mem_watcher_path;
 
     struct stat buffer;
