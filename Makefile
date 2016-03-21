@@ -13,25 +13,25 @@ UTIL=Util/*.cpp
 EXECUTABLE=smashbot
 
 #all: $(OBJ)
-all: goals.sylvan strats.sylvan tactics.sylvan chains.sylvan util.sylvan main
+all: goals.d strats.d tactics.d chains.d util.d main
 	$(CC) $(LDFLAGS) -o $(EXECUTABLE) *.o
 
 main:
 	$(CC) $(CFLAGS) $(SOURCES)
 
-goals.sylvan:
+goals.d:
 	$(CC) $(CFLAGS) $(GOALS)
 
-strats.sylvan:
+strats.d:
 	$(CC) $(CFLAGS) $(STRATS)
 
-tactics.sylvan:
+tactics.d:
 	$(CC) $(CFLAGS) $(TACTICS)
 
-chains.sylvan:
+chains.d:
 	$(CC) $(CFLAGS) $(CHAINS)
 
-util.sylvan:
+util.d:
 	$(CC) $(CFLAGS) $(UTIL)
 
 clean:
