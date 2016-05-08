@@ -1,6 +1,6 @@
 #include "KillOpponent.h"
-#include "../Strategies/Bait.h"
-#include "../Strategies/Sandbag.h"
+#include "../Strategies/JabStrategy.h"
+
 
 KillOpponent::KillOpponent()
 {
@@ -14,16 +14,9 @@ KillOpponent::~KillOpponent()
 
 void KillOpponent::Strategize()
 {
-    //If the opponent is invincible, don't attack them. Just dodge everything they do
-    if(m_state->m_memory->player_one_invulnerable)
-    {
-        CreateStrategy(Sandbag);
-        m_strategy->DetermineTactic();
-    }
-    else
-    {
-        CreateStrategy(Bait);
-        m_strategy->DetermineTactic();
-    }
+
+    //Do Jab Strategy
+    CreateStrategy(JabStrategy);
+    m_strategy->DetermineTactic();
 
 }
