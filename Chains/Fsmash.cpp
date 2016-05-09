@@ -12,10 +12,10 @@ void Fsmash::PressButtons()
             bool isOnRight = m_state->m_memory->player_one_x < m_state->m_memory->player_two_x;
             if(isOnRight)
             {
-                m_controller->tiltAnalog(Controller::BUTTON_C, .5, 1);
+                m_controller->tiltAnalog(Controller::BUTTON_C, 1, .5);
             }       
             else {
-                m_controller->tiltAnalog(Controller::BUTTON_C, .5, -1);
+                m_controller->tiltAnalog(Controller::BUTTON_C, 0, .5);
             }       
   
             break;
