@@ -3,10 +3,10 @@
 void Fsmash::PressButtons()
 {
     uint frame = m_state->m_memory->frame - m_startingFrame;
-    switch(frame)
-    {
-        case 0:
-        {
+    // switch(frame)
+    // {
+    //     case 0:
+    //     {
             //Fsmash
 
             bool isOnRight = m_state->m_memory->player_one_x < m_state->m_memory->player_two_x;
@@ -18,14 +18,14 @@ void Fsmash::PressButtons()
                 m_controller->tiltAnalog(Controller::BUTTON_C, 1, .5);
             }       
   
-            break;
-        }
-        case 1:
-        {
-            //Let go of Fsmash
-            m_controller->tiltAnalog(Controller::BUTTON_C, .5, .5);
-            break;
-        }
+            // break;
+        // }
+        // case 1:
+        // {
+            // //Let go of Fsmash
+            // m_controller->tiltAnalog(Controller::BUTTON_C, .5, .5);
+            // break;
+        // }
     }
 }
 
