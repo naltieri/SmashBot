@@ -1,5 +1,5 @@
 #include "KillOpponent.h"
-#include "../Strategies/FsmashStrategy.h"
+#include "../Strategies/JabStrategy.h"
 
 
 KillOpponent::KillOpponent()
@@ -15,8 +15,8 @@ KillOpponent::~KillOpponent()
 void KillOpponent::Strategize()
 {
 
-    //Do Fsmash Strategy
-    CreateStrategy(FsmashStrategy);
+    //Do Jab Strategy
+    CreateStrategy(JabStrategy);
     m_strategy->DetermineTactic();
 
 }

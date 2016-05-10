@@ -1,0 +1,6 @@
+cpu
+smashbot
+*.o
+*.d
+*~
+Logs/*
