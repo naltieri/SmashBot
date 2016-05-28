@@ -11,6 +11,8 @@
 #include <csignal>
 #include <string>
 #include <time.h>
+#include <sstream>
+
 
 #include "Goals/KillOpponent.h"
 #include "Goals/NavigateMenu.h"
@@ -18,8 +20,11 @@
 #include "Util/GameState.h"
 #include "Util/MemoryWatcher.h"
 #include "Util/Logger.h"
+#include "Util/Controller.h"
+
 
 bool isDebug = false;
+
 
 void FirstTimeSetup()
 {
@@ -156,6 +161,8 @@ int main(int argc, char *argv[])
     Logger *logger = Logger::Instance();
     logger->SetDebug(isDebug);
     GameState *state = GameState::Instance();
+    Controller *m_controller;
+    m_controller = Controller::Instance();  
 
     MemoryWatcher *watcher = new MemoryWatcher();
     uint last_frame = 0;
@@ -185,16 +192,75 @@ int main(int argc, char *argv[])
             //If we're in a match, play the match!
             if(state->m_memory->menu_state == IN_GAME)
             {
-                if(goal == NULL )
-                {
-                    goal = new KillOpponent();
+                //Write Gamestate to File:
+                //Open GamestateFile:
+                //Q: Why do we need std? Something to do with namestates
+                std::ofstream myfile;
+                myfile.open ("gamestate.txt");
+
+                //A temp string, where we will store all writes
+                std::string s;
+                //Write each object from memory watcher into this file
+                //Note: this is writing a hex value
+                s = std::to_string(state->m_memory->player_one_action);
+                myfile << s+"n";
+
+                myfile.close(); 
+
+                myfile.open ("curframe.txt");
+                int cur_frame = state->m_memory->frame;
+                s = std::to_string(cur_frame);
+                myfile << s+"n";
+
+                myfile.close(); 
+
+                //Get new input from python
+                bool pythonRun = true;
+                //Initialize to -1, you know, just in case
+                int py_frame = -1;
+                while(pythonRun){
+                    std::ifstream myfile ("pyframe.txt");
+                    std::string line;
+                    // I don't understand why this if-else clause is necessary but it's in the tutorial
+                    if (myfile.is_open()){
+                        getline (myfile,line);
+                        myfile.close();
+                        // I don't understand why this works; I just copy-pasted it from quora      
+                        std::stringstream convert(line);
+                        convert>>py_frame;
+                    }  
+                    else std::cout << "Unable to open pyframe"; 
+                    if(py_frame == cur_frame){
+                        //We have just completed our computation of the next action
+                        pythonRun = false;
+
+                        //Read new actions 
+                        std::ifstream myfile ("inputs.txt");
+                        std::string line;
+                        int input;
+
+                        // I don't understand why this if-else clause is necessary but it's in the tutorial
+                        if (myfile.is_open()){
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convert(line);
+                            convert>>input;
+                            if(input == 1){
+                                //Press A
+                                m_controller->pressButton(Controller::BUTTON_A);
+
+                            }else{
+                                //Input should be zero
+                                //Release A
+                                m_controller->releaseButton(Controller::BUTTON_A);
+                            }
+                            myfile.close();
+                                                    }  
+                        else std::cout << "Unable to open inputs"; 
+                        }
+
                 }
-                if(typeid(*goal) != typeid(KillOpponent))
-                {
-                    delete goal;
-                    goal = new KillOpponent();
-                }
-                goal->Strategize();
+
             }
             //If we're in a menu, then let's navigate the menu
             else if(state->m_memory->menu_state == CHARACTER_SELECT ||
