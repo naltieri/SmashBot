@@ -5,78 +5,49 @@ to another file.
 import os
 import numpy as np
 
-def read_gamestate_from_file(fileloc="./gamestate.txt"):
-    pass
-    #return np.array()
-def get_gamestate(from_c="./gamestate.txt",previous_buttons=_previous_buttons):#from_py="./controlleraction.txt"):
-    return {'framenum':get_frame_num(from_c),''}
-
-def opponent_is_on_left(gamestate):
-    return True #TODO
-def can_I_jab_now(gamestate):
-    return True #TODO
-
-def write_action_jab(filoc="./controlleraction.txt"):
-    with open(fileloc,'w') as f:
-        f.write(get_jab_action_as_string())
-
-def get_jab_action_as_string():
-    return "press_A"
-
 def start_smashbot():
     os.system("./smashbot")
 
+def get_frame():
+    f = open('curframe.txt', 'r')
+    #Test this
+    new_frame = int(f.read())
+    print('new frame is ')
+    print(new_frame)
+    return new_frame
+
+def get_inputs(gamestate,prev_inputs):
+    #Jab
+    inputs = np.zeros(14)
+    if gamestate % 2 == 0:
+        inputs[0] = 1
+    return inputs
+
+def get_gamestate():
+    f = open('curframe.txt', 'r')
+    #Test this
+    gamestate = int(f.read())
+    print('gamestate is ')
+    print(gamestate)
+    return gamestate
+
 if __name__=="__main__":
     start_smashbot()
-    if playing_game():
-        while True:
-            gs=get_gamestate
-            write_action(gs)
-
-
-#include "Jab.h"
-
-void Jab::PressButtons()
-{
-    uint frame = m_state->m_memory->frame - m_startingFrame;
-    switch(frame)
-    {
-        case 0:
-        {
-            //Jab
-            m_controller->pressButton(Controller::BUTTON_A);
-            m_controller->tiltAnalog(Controller::BUTTON_MAIN, .5, .5);
-            break;
-        }
-        case 1:
-        {
-            //Let go of jab
-            m_controller->releaseButton(Controller::BUTTON_A);
-            break;
-        }
-    }
-}
-
-bool Jab::IsInterruptible()
-{
-    if(m_state->m_memory->player_two_action == STANDING)
-    {
-        return true;
-    }
-
-    uint frame = m_state->m_memory->frame - m_startingFrame;
-    if(frame >= 18)
-    {
-        return true;
-    }
-    return false;
-}
-
-Jab::Jab()
-{
-    m_startingFrame = m_state->m_memory->frame;
-}
-
-Jab::~Jab()
-{
-}
+    cur_frame = 0 
+    prev_inputs = np.zeros(14)
+    while True:
+        #Check for new frame:
+        new_frame = get_frame()
+        if new_frame > cur_frame:
+            #Get gamestate:
+            game_state = get_gamestate()
+            #Get input
+            new_input = get_inputs(game_state,prev_inputs)
+            #Write input
+            np.savetxt('inputs.out', x, delimiter=',') 
+            #Write new_frame
+            fileloc = 'pyframe.txt'
+            with open(fileloc,'w') as f:
+                f.write(str(new_frame))
+            cur_frame = new_frame  
+            prev_inputs = new_input
