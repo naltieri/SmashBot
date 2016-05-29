@@ -47,15 +47,15 @@ private:
     std::string STRING_X = "X";
     std::string STRING_Y = "Y";
     std::string STRING_Z = "Z";
-    std::string STRING_START = "START";
     std::string STRING_L = "L";
     std::string STRING_R = "R";
     std::string STRING_D_UP = "D_UP";
+    std::string STRING_C = "C";
+    std::string STRING_MAIN = "MAIN";
+    std::string STRING_START = "START";
     std::string STRING_D_DOWN = "D_DOWN";
     std::string STRING_D_LEFT = "D_LEFT";
     std::string STRING_D_RIGHT = "D_RIGHT";
-    std::string STRING_C = "C";
-    std::string STRING_MAIN = "MAIN";
 };
 
 #endif

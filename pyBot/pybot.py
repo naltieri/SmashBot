@@ -5,6 +5,85 @@ to another file.
 import csv
 import os
 import numpy as np
+import random 
+class QAgent(object):
+	
+	def __init__(self,d):
+		possible_inputs, init_weights = self.initialize(d)
+		self.actions = possible_inputs
+		self.weights = init_weights
+		self.discount = .8
+		self.alpha = .1
+	
+
+	def update_weights(self,weights,delta,features):
+		return weights + self.alpha * delta * features
+		
+	def value_function(self,weights,state):
+		best_val = -1*np.inf
+		for action in self.actions:
+			val = np.dot(self.featurize(state,action),weights)
+			if val > best_val:
+				val = best_val
+		return val
+			
+	def featurize(self,state,action):
+		feat = np.concatenate((state.flatten(),action.flatten()))
+		return feat 
+		
+	def initialize(self,d):
+		possible_inputs = []
+		num_samples = 100
+		for i in range(12):
+			for j in range(num_samples):
+				new_input = np.zeros(12)
+				new_input[i] = 1
+				if j == 0:
+					new_input[8] = .5
+					new_input[9] = .5
+					new_input[10] = .5
+					new_input[11]= .5
+					possible_inputs.append(new_input)
+				else:
+					new_input[8] = np.random.rand(1)
+					new_input[9] = np.random.rand(1)
+					new_input[10] = .5
+					new_input[11]= .5
+					possible_inputs.append(new_input)
+					
+			for j in range(num_samples):
+				new_input[8] = .5
+				new_input[9] = .5
+				new_input[10] = np.random.rand(1)
+				new_input[11]= np.random.rand(1)
+				possible_inputs.append(new_input)
+		init_weights = np.random.randn(d)
+		return possible_inputs, init_weights
+
+
+	def q_value(self,state,action,weights):
+		features = self.featurize(state,action)
+		return np.dot(weights,features)
+		
+	def update(self,state,action,reward,weights):
+		delta = reward + self.discount*self.value_function(weights,state) - self.q_value(state,action,weights)
+		features = self.featurize(state,action)
+		weights = self.update_weights(weights,delta,features)
+		
+	def get_action(self,state,weights):
+		#TODO: Vectorize
+		eps = .05
+		if np.random.binomial(1,eps):
+			return random.choice(self.actions)
+		best_action = None 
+		best_val = -1*np.inf
+		for action in self.actions:
+			cur_val = self.q_value(state,action,weights)
+			if cur_val > best_val:
+				best_val = cur_val
+				best_action = action
+		return action
+
 
 def start_smashbot():
 	os.system("./smashbot")
@@ -19,13 +98,40 @@ def get_frame():
 		except: 
 			0
 	return new_frame
+	
+def get_reward(gamestate,prev_gamestate):
+	#Change in p1 percent
+	new_p1_percent = gamestate[3]
+	old_p1_percent = prev_gamestate[3]
+	p1_per = new_p1_percent - old_p1_percent
+	#Change in p2 percent
+	new_p2_percent = gamestate[4]
+	old_p2_percent = prev_gamestate[4]
+	p2_per = new_p2_percent - old_p2_percent
+	#Change in p1 stocks
+	new_p1_stocks = gamestate[5]
+	old_p1_stocks = prev_gamestate[5]
+	p1_stock_change = new_p1_stocks-old_p1_stocks
+	#Change in p2 stocks
+	new_p2_stocks = gamestate[6]
+	old_p2_stocks = prev_gamestate[6]
+	p2_stock_change = new_p2_stocks-old_p2_stocks
+	
+	
+	reward = p1_per - p2_per + 100*p2_stock_change
+	return reward
 
-def get_inputs(gamestate,prev_inputs):
-	#Jab
-	inputs = np.zeros(12)
-	inputs = np.random.rand(12)
+def get_inputs(gamestate,prev_gamestate,prev_inputs,agent):
+	state = np.concatenate((gamestate.flatten(),prev_inputs.flatten()))
+	inputs = agent.get_action(state,agent.weights)
+	reward = get_reward(gamestate,prev_gamestate)
+	agent.update(state,inputs,reward,agent.weights)
 	return inputs
 
+
+	
+	
+	
 def get_gamestate():
 
 	p1damage=[]
@@ -189,8 +295,11 @@ def write_input(new_input):
 	
 
 def run_pybot():
+	
 	cur_frame = -1
 	prev_inputs = np.zeros(12)
+	initialized = False
+	
 	while True:
 		#Check for new frame:
 		new_frame = get_frame()
@@ -198,8 +307,14 @@ def run_pybot():
 		if new_frame > cur_frame:
 			#Get gamestate:
 			game_state = get_gamestate()
+			if initialized == False:
+				initialized = True
+				d = game_state.shape[0] + 24
+				agent = QAgent(d)
+				prev_game_state = game_state
+				
 			#Get input
-			new_input = get_inputs(game_state,prev_inputs)
+			new_input = get_inputs(game_state,prev_game_state,prev_inputs,agent)
 			#Write input
 			write_input(new_input)
 			#Write new_frame
@@ -208,10 +323,12 @@ def run_pybot():
 				f.write(str(new_frame))
 			cur_frame = new_frame  
 			prev_inputs = new_input
+			prev_game_state = game_state
 
 
 if __name__=="__main__":
 	#Writing initial files:
+	
 	fileloc = 'curframe.txt'
 	with open(fileloc,'w') as f:
 		f.write(str(-1))
