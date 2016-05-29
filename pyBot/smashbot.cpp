@@ -180,7 +180,6 @@ int main(int argc, char *argv[])
         }
 
         current_menu = (MENU)state->m_memory->menu_state;
-		printf("%d \n", state->m_memory->frame);
         if(state->m_memory->frame != last_frame)
         {
             if(state->m_memory->frame > last_frame+1)
@@ -198,30 +197,103 @@ int main(int argc, char *argv[])
 
 				frame_s = std::to_string(state->m_memory->frame);
 
-				printf("%s\n", frame_s.c_str());
-
 
 				
                 //Write Gamestate to File:
                 //Open GamestateFile:
                 //Q: Why do we need std? Something to do with namestates
-                printf("%s/n", "Writing gamestate.txt");
-                std::ofstream myfile;
-                myfile.open ("gamestate.txt");
+                std::ofstream statef;
+                statef.open ("gamestate.txt");
+                
+                
+                
+				int fnum = 0;
 
-                //A temp string, where we will store all writes
-                std::string s;
-                //Write each object from memory watcher into this file
-                //Note: this is writing a hex value
-                s = std::to_string(state->m_memory->frame);
-                myfile << s;
+				statef <<  std::dec << state->m_memory->frame << ","; //0
+				statef <<  std::dec << fnum << ",";
+				statef <<  std::clock() << ",";
+				statef <<  state->m_memory->player_one_percent << ","; 
+				statef <<  state->m_memory->player_two_percent << ",";  //4
+				statef <<  state->m_memory->player_one_stock << ",";
+				statef <<  state->m_memory->player_two_stock << ",";
+				statef <<  state->m_memory->player_one_character << ",";
+				statef <<  state->m_memory->player_two_character << ",";  //8
+				statef <<  state->m_memory->player_one_facing << ",";
+				statef <<  state->m_memory->player_two_facing << ",";
 
-                myfile.close(); 
+				statef <<  std::hex << state->m_memory->stage << ",";
+				
+				statef <<  state->m_memory->menu_state << ",";   //12
+				statef <<  state->m_memory->player_two_pointer_x << ",";
+				statef <<  state->m_memory->player_two_pointer_y << ",";
 
-				printf("%s/n", "Writing curframe.txt");
+				statef <<  std::fixed << std::setprecision(2) << state->m_memory->player_one_x << ",";
+				statef <<  std::fixed << std::setprecision(2) << state->m_memory->player_one_y << ",";  //16
+
+				statef <<  std::fixed << std::setprecision(2) << state->m_memory->player_two_x << ",";
+				statef <<  std::fixed << std::setprecision(2) << state->m_memory->player_two_y << ",";
+
+				statef <<  std::hex << state->m_memory->player_one_action << ",";
+				statef <<  std::hex << state->m_memory->player_two_action << ",";  //20
+
+				statef <<  std::dec << state->m_memory->player_one_action_counter << ",";
+				statef <<  std::dec << state->m_memory->player_two_action_counter << ",";
+
+				statef <<  std::dec << state->m_memory->player_one_action_frame << ",";
+				statef <<  std::dec << state->m_memory->player_two_action_frame << ",";  //24
+
+				statef <<  state->m_memory->player_one_invulnerable << ",";
+				statef <<  state->m_memory->player_two_invulnerable << ",";
+
+				statef <<  state->m_memory->player_one_charging_smash << ",";
+				statef <<  state->m_memory->player_two_charging_smash << ",";  //28
+
+				statef <<  state->m_memory->player_one_hitlag_frames_left << ",";
+				statef <<  state->m_memory->player_two_hitlag_frames_left << ",";
+
+				statef <<  state->m_memory->player_one_hitstun_frames_left << ",";
+				statef <<  state->m_memory->player_two_hitstun_frames_left << ",";  //32
+
+				statef <<  state->m_memory->player_one_jumps_left << ",";
+				statef <<  state->m_memory->player_two_jumps_left << ",";
+
+				statef <<  state->m_memory->player_one_on_ground << ",";
+				statef <<  state->m_memory->player_two_on_ground << ",";  //36
+
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_one_speed_air_x_self << ",";
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_two_speed_air_x_self << ",";
+
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_one_speed_y_self << ",";
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_two_speed_y_self << ",";  //40
+
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_one_speed_x_attack << ",";
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_two_speed_x_attack << ",";
+
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_one_speed_y_attack << ",";
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_two_speed_y_attack << ",";  //44
+
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_one_speed_ground_x_self << ",";
+				statef <<  std::fixed << std::setprecision(2) <<  state->m_memory->player_two_speed_ground_x_self << "\n";
+				
+				//statef <<  state->m_memory->controller_1_digital << ",";
+				//statef <<  state->m_memory->controller_1_analog << ",";  //48
+				//statef <<  state->m_memory->controller_1_shoulder << ",";
+				
+				//statef <<  state->m_memory->controller_2_digital << ",";
+				//statef <<  state->m_memory->controller_2_analog << ",";
+				//statef <<  state->m_memory->controller_2_shoulder << "\n";  //52
+				
+				
+
+
+                statef.close(); 
+
+				std::ofstream myfile;
 
                 myfile.open ("curframe.txt");
                 int cur_frame = state->m_memory->frame;
+                std::string s;
+
                 s = std::to_string(cur_frame);
                 myfile << s;
 
@@ -249,18 +321,19 @@ int main(int argc, char *argv[])
                         pythonRun = false;
 
                         //Read new actions 
-                        printf("%s\n", "Reading inputs.txt");
 
                         std::ifstream myfile ("inputs.txt");
                         std::string line;
                         int input;
+                        double x;
+                        double y;
 
                         // I don't understand why this if-else clause is necessary but it's in the tutorial
                         if (myfile.is_open()){
                             getline (myfile,line);
                             // I don't understand why this works; I just copy-pasted it from quora
-                            std::stringstream convert(line);
-                            convert>>input;
+                            std::stringstream converta(line);
+                            converta>>input;
                             if(input == 1){
                                 //Press A
                                 m_controller->pressButton(Controller::BUTTON_A);
@@ -270,6 +343,130 @@ int main(int argc, char *argv[])
                                 //Release A
                                 m_controller->releaseButton(Controller::BUTTON_A);
                             }
+                            
+                            
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertb(line);
+                            convertb>>input;
+                            if(input == 1){
+                                //Press B
+                                m_controller->pressButton(Controller::BUTTON_B);
+
+                            }else{
+                                //Input should be zero
+                                //Release B
+                                m_controller->releaseButton(Controller::BUTTON_B);
+                            }
+                            
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertx(line);
+                            convertx>>input;
+                            if(input == 1){
+                                //Press X
+                                m_controller->pressButton(Controller::BUTTON_X);
+
+                            }else{
+                                //Input should be zero
+                                //Release X
+                                m_controller->releaseButton(Controller::BUTTON_X);
+                            }
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream converty(line);
+                            converty>>input;
+                            if(input == 1){
+                                //Press Y
+                                m_controller->pressButton(Controller::BUTTON_Y);
+
+                            }else{
+                                //Input should be zero
+                                //Release Y
+                                m_controller->releaseButton(Controller::BUTTON_Y);
+                            }
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertz(line);
+                            convertz>>input;
+                            if(input == 1){
+                                //Press Z
+                                m_controller->pressButton(Controller::BUTTON_Z);
+
+                            }else{
+                                //Input should be zero
+                                //Release Z
+                                m_controller->releaseButton(Controller::BUTTON_Z);
+                            }
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertl(line);
+                            convertl>>input;
+                            if(input == 1){
+                                //Press L
+                                m_controller->pressButton(Controller::BUTTON_L);
+
+                            }else{
+                                //Input should be zero
+                                //Release L
+                                m_controller->releaseButton(Controller::BUTTON_L);
+                            }
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertr(line);
+                            convertr>>input;
+                            if(input == 1){
+                                //Press R
+                                m_controller->pressButton(Controller::BUTTON_R);
+
+                            }else{
+                                //Input should be zero
+                                //Release R
+                                m_controller->releaseButton(Controller::BUTTON_R);
+                            }
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertd(line);
+                            convertd>>input;
+                            if(input == 1){
+                                //Press Up on D-pad
+                                m_controller->pressButton(Controller::BUTTON_D_UP);
+
+                            }else{
+                                //Input should be zero
+                                //Release Up on D-pad
+                                m_controller->releaseButton(Controller::BUTTON_D_UP);
+                            }
+                            
+                            
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertax(line);
+                            convertax>>x;
+                            
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertay(line);
+                            convertay>>y;
+       
+							//Press direction on analog stick
+							m_controller->tiltAnalog(Controller::BUTTON_MAIN, x, y);
+							
+							
+							getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertcx(line);
+                            convertcx>>x;
+                            
+                            getline (myfile,line);
+                            // I don't understand why this works; I just copy-pasted it from quora
+                            std::stringstream convertcy(line);
+                            convertcy>>y;
+       
+							//Press direction on analog stick
+							m_controller->tiltAnalog(Controller::BUTTON_C, x, y);
+
+
                             myfile.close();
                                                     }  
                         else std::cout << "Unable to open inputs\n"; 
