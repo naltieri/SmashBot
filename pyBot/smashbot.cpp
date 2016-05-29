@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
         }
 
         current_menu = (MENU)state->m_memory->menu_state;
-
+		printf("%d \n", state->m_memory->frame);
         if(state->m_memory->frame != last_frame)
         {
             if(state->m_memory->frame > last_frame+1)
@@ -192,9 +192,20 @@ int main(int argc, char *argv[])
             //If we're in a match, play the match!
             if(state->m_memory->menu_state == IN_GAME)
             {
+				//Make sure our states are updated before writing
+				watcher->ReadMemory();
+				std::string frame_s;
+
+				frame_s = std::to_string(state->m_memory->frame);
+
+				printf("%s\n", frame_s.c_str());
+
+
+				
                 //Write Gamestate to File:
                 //Open GamestateFile:
                 //Q: Why do we need std? Something to do with namestates
+                printf("%s/n", "Writing gamestate.txt");
                 std::ofstream myfile;
                 myfile.open ("gamestate.txt");
 
@@ -202,15 +213,17 @@ int main(int argc, char *argv[])
                 std::string s;
                 //Write each object from memory watcher into this file
                 //Note: this is writing a hex value
-                s = std::to_string(state->m_memory->player_one_action);
-                myfile << s+"n";
+                s = std::to_string(state->m_memory->frame);
+                myfile << s;
 
                 myfile.close(); 
+
+				printf("%s/n", "Writing curframe.txt");
 
                 myfile.open ("curframe.txt");
                 int cur_frame = state->m_memory->frame;
                 s = std::to_string(cur_frame);
-                myfile << s+"n";
+                myfile << s;
 
                 myfile.close(); 
 
@@ -219,6 +232,7 @@ int main(int argc, char *argv[])
                 //Initialize to -1, you know, just in case
                 int py_frame = -1;
                 while(pythonRun){
+
                     std::ifstream myfile ("pyframe.txt");
                     std::string line;
                     // I don't understand why this if-else clause is necessary but it's in the tutorial
@@ -229,12 +243,14 @@ int main(int argc, char *argv[])
                         std::stringstream convert(line);
                         convert>>py_frame;
                     }  
-                    else std::cout << "Unable to open pyframe"; 
+                    else std::cout << "Unable to open pyframe\n"; 
                     if(py_frame == cur_frame){
                         //We have just completed our computation of the next action
                         pythonRun = false;
 
                         //Read new actions 
+                        printf("%s\n", "Reading inputs.txt");
+
                         std::ifstream myfile ("inputs.txt");
                         std::string line;
                         int input;
@@ -256,7 +272,7 @@ int main(int argc, char *argv[])
                             }
                             myfile.close();
                                                     }  
-                        else std::cout << "Unable to open inputs"; 
+                        else std::cout << "Unable to open inputs\n"; 
                         }
 
                 }
